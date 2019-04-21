@@ -4,7 +4,12 @@ output:
   html_document: default
   pdf_document: default
 ---
-
+##### **Data**: `r Sys.time()`
+##### **Autor**: Albert Zagrajek az76558@student.sgh.waw.pl
+##### **Numer indeksu**: az76558
+##### **Przedmiot**: Prezentacja i wizualizacja danych
+##### **Kierunek**: Big Data
+##### **Uczelnia**: Szkoła Głowna Handlowa w Warszawie
 
 ---
 
@@ -117,6 +122,7 @@ print(wyk.wolumen,split=c(1,1,1,1),more=F)
 #Zadanie 1.2
 ###Histogram różnic kursów zamknięcia i otwarcia
 ```{r,echo=F,results="asis",message=F,warning=F,fig.height=5,fig.width=9}
+##usuwam dane przed 200-11-17 ponieważ nie ceny max min otwarcie i zamkniecia nie roznia sie
 data2 <- data[data$Data >= '2000-11-17',]
 wyk.hist <- histogram(~Roznica,data=data2,
                       type="count",
