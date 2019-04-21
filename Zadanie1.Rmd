@@ -1,0 +1,179 @@
+---
+title: "Zadanie 1"
+output:
+  html_document: default
+  pdf_document: default
+---
+##### **Data**: `r Sys.time()`
+##### **Autor**: Albert Zagrajek az76558@student.sgh.waw.pl
+##### **Numer indeksu**: az76558
+##### **Przedmiot**: Prezentacja i wizualizacja danych
+##### **Kierunek**: Big Data
+##### **Uczelnia**: Szkoła Głowna Handlowa w Warszawie
+
+---
+
+
+
+```{r, results="hide", echo=FALSE,message=F,warning=F}
+library(tidyverse)
+library(lubridate)
+library(lattice)
+library(latticeExtra)
+
+  data <- read.csv(file="https://stooq.pl/q/d/l/?s=wig&i=d",sep=",",dec=".",header=T,stringsAsFactors=F)
+data[is.na(data)] <- 0
+write.table(data,file="data.csv",sep=";",dec=".",row.names=F)
+
+```
+
+
+
+
+# Zadanie 1.1
+###Ogólna postać szeregów czasowych cen i wolumenu
+```{r, echo=F, results="hide",message=F,warning=F,fig.height=16,fig.width=12}
+    
+    
+    data$Roznica=data$Zamkniecie-data$Otwarcie
+    
+    data$roznicamaxmin=data$Najwyzszy-data$Najnizszy
+    
+    data$dzientygodnia <- wday(as.Date(data$Data),label=T)
+    
+    data$dzienmiesiaca <- as.POSIXlt(data$Data)$mday
+    
+    data$Data <- as.Date(data$Data)
+    
+    mysettings <- trellis.par.get()
+mysettings$fontsize$text <- 12
+mysettings$axis.line$lwd <- 2
+mysettings$axis.line$col <- "black"
+mysettings$background$col <- "bisque2"
+mysettings$panel.background$col <- "bisque"
+mysettings$axis.text$cex <- 0.8
+mysettings$par.sub.text$cex <- 0.8
+mysettings$par.sub.text$col <- "darkgoldenrod4"
+mysettings$plot.line$col <- "darkgoldenrod4"
+mysettings$plot.line$alpha <- 0.9
+mysettings$par.xlab.text$cex <- 0.8
+mysettings$par.xlab.text$col <- "darkgoldenrod4"
+mysettings$par.ylab.text$cex <- 0.8
+mysettings$par.ylab.text$col <- "darkgoldenrod4"
+mysettings$par.main.text$col="darkgoldenrod4"
+mysettings$par.main.text$cex=1
+mysettings$box.dot$col="dargoldenrod4"
+mysettings$box.umbrella$col <- "darkgoldenrod4"
+mysettings$box.rectangle$col <- "darkgoldenrod4"
+```
+
+
+```{r,echo=F,results="asis",fig.height=11,fig.width=9,message=F,warning=F}
+wyk.otw <- xyplot(Otwarcie~Data,
+                  data=data,
+                  type="l",
+                  par.settings=mysettings,
+                  main="Cena otwarcia",
+                  xlab="Data",
+                  ylab="Otwarcie" )
+wyk.zam <- xyplot(Zamkniecie~Data,
+                  data=data,
+                  type="l",
+                  par.settings=mysettings,
+                  main="Cena Zamknięcia",
+                  xlab="Data",
+                  ylab="Zamkniecie" )
+wyk.najw <- xyplot(Najwyzszy~Data,
+                  data=data,
+                  type="l",
+                  par.settings=mysettings,
+                  main="Najwyzsza cena danego dnia",
+                  xlab="Data",
+                  ylab="Najwyzsza" )
+wyk.najn <- xyplot(Najnizszy~Data,
+                  data=data,
+                  type="l",
+                  par.settings=mysettings,
+                  main="Najnizsza cena danego dnia",
+                  xlab="Data",
+                  ylab="Najnizsza" )
+wyk.wolumen <-  xyplot(Wolumen~Data,
+                  data=data,
+                  type="l",
+                  par.settings=mysettings,
+                  main="Wolumen",
+                  xlab="Data",
+                  ylab="Wolumen" )
+
+print(wyk.otw, split = c(1,1,2,2), more=T)
+print(wyk.zam, split = c(2,1,2,2), more=T)
+print(wyk.najw, split = c(1,2,2,2), more=T)
+print(wyk.najn, split = c(2,2,2,2), more=F)
+
+
+```
+
+
+```{r,echo=F,results="asis",message=F,warning=F,fig.height=5,fig.width=9}
+print(wyk.wolumen,split=c(1,1,1,1),more=F)
+```
+
+
+#Zadanie 1.2
+###Histogram różnic kursów zamknięcia i otwarcia
+```{r,echo=F,results="asis",message=F,warning=F,fig.height=5,fig.width=9}
+data2 <- data[data$Data >= '2000-11-17',]
+wyk.hist <- histogram(~Roznica,data=data2,
+                      type="count",
+                      breaks=53,
+                      par.settings=mysettings,
+                      main="Histogram różnic cen",
+                      sub="Typ:ilościowy",
+                      col="darkgoldenrod4",
+                      xlab="Różnica",
+                      ylab="Ilość")
+wyk.hist2 <- histogram(~Roznica,data=data2,
+                      type="percent",
+                      breaks=53,
+                      par.settings=mysettings,
+                      main="Histogram różnic cen",
+                      sub="Typ:procentowy",
+                      col="darkgoldenrod4",
+                      ylab="Procent",
+                      xlab="Różnica"
+                      )
+print(wyk.hist,split=c(1,1,2,1),more=T)
+print(wyk.hist2,split=c(2,1,2,1),more=F)
+```
+
+#Zadanie 1.3
+###Boxplot różnic kursów max i min dla typów dni
+```{r,echo=F,results="asis",message=F,warning=F,fig.height=11,fig.width=9}
+data2$Day_of_month <- factor(lubridate::day(data2$Data), levels = seq(1, 31, 1), labels = seq(1, 31, 1), ordered = TRUE)
+
+wyk.boxplot <- bwplot(roznicamaxmin~dzientygodnia,data=data2,
+                      par.settings=mysettings,
+                      main="Wykres boxplot względem dni tygodnia",
+                      
+                      col=c("darkgoldenrod4","darkgoldenrod3"),
+                      fill=c("darkgoldenrod3","darkgoldenrod4"),
+                      
+                      xlab="Dzień tygodnia",
+                      ylab="Wartość")
+wyk.boxplot2 <- bwplot(roznicamaxmin~Day_of_month,data=data2,
+                      par.settings=mysettings,
+                      main="Wykres boxplot względem dni miesiąca",
+                      
+                      col=c("darkgoldenrod4","darkgoldenrod3"),
+                     fill=c("darkgoldenrod3","darkgoldenrod4"),
+                      xlab="Dzień tygodnia",
+                      ylab="Wartość",
+                      )
+
+                      
+print(wyk.boxplot,split=c(1,1,1,2),more=T)
+print(wyk.boxplot2,split=c(1,2,1,2),more=F)
+```
+
+
+
