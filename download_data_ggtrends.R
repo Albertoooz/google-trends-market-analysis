@@ -41,7 +41,7 @@ for (i in 1:length(x)){
     for (m in 1:length(trend2$interest_over_time$hits)){
       trend2$interest_over_time$hits[m]=trend2$interest_over_time$hits[m]*last/first
     }
-    ####usuwanie powtóronych wierszy(byly one potrzebne do skalowana)
+    ####usuwanie powtÃ³ronych wierszy(byly one potrzebne do skalowana)
     trend2$interest_over_time <- trend2$interest_over_time[-c(1,2),]
     
     ###laczenie pierwszego okresu i drugiego
