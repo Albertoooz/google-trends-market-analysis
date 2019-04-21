@@ -4,12 +4,7 @@ output:
   html_document: default
   pdf_document: default
 ---
-##### **Data**: `r Sys.time()`
-##### **Autor**: Albert Zagrajek az76558@student.sgh.waw.pl
-##### **Numer indeksu**: az76558
-##### **Przedmiot**: Prezentacja i wizualizacja danych
-##### **Kierunek**: Big Data
-##### **Uczelnia**: Szkoła Głowna Handlowa w Warszawie
+
 
 ---
 
