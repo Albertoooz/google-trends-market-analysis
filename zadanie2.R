@@ -6,7 +6,6 @@ library(officer)
 
 library(magrittr)
 
-setwd("C:/Users/Albert/Desktop/praca domowa piwd")
 
 data <- read.csv(file="https://stooq.pl/q/d/l/?s=wig&i=d",sep=",",dec=".",header=T,stringsAsFactors=F)
 data[is.na(data)] <- 0
@@ -50,6 +49,7 @@ graphics::plot(y = data$Najwyzszy,
                main = "Najwyzsza cena danego dnia",col="darkgoldenrod4",
                col.lab = "darkgoldenrod4", col.sub = "darkgoldenrod4", las = 2)
 graphics::box("figure", col = "darkgoldenrod4", lwd = 1) 
+
 graphics::plot(y = data$Wolumen,
                x = data$Data,
                xlab = "Data", ylab = "", type = "h",
@@ -59,6 +59,7 @@ graphics::box("figure", col = "darkgoldenrod4", lwd = 1)
 dev.off()
 
 ### zadanie 2.2
+#usuwam dane przed 200-11-17 ze względu na brak różnic między Cenami zamknięcia otwarcia max i min
 data2 <- data[data$Data >= '2000-11-17',]
 jpeg(file="Wykres2.jpeg", width  =  4 * 240, height  =  4 * 240)
 
@@ -94,28 +95,37 @@ dev.off()
 
 ##zadanie 2.4
 
-podsumowanie <- data.frame(unclass(summary(data)), check.names = FALSE, stringsAsFactors = FALSE)
-podsumowanie2 <- data.frame(unclass(summary(data2)), check.names = FALSE, stringsAsFactors = FALSE)
-dplyr::arrange(podsumowanie2) -> final_table
+
+
+data3 <- data2%>%
+  select(Zamkniecie,Otwarcie,Najwyzszy,Najnizszy,Wolumen)
+
+podsumowanie3 <- round(do.call(cbind, lapply(data3,summary)),0)
+
+podsumowanie3 <- as.data.frame(podsumowanie3)
+podsumowanie3$Typ[1:6] <- c("Min","1st Qu","Median","Mean","3rd Qu","Max")
+podsumowanie3 <- podsumowanie3%>%
+  select(Typ,Zamkniecie,Otwarcie,Najwyzszy,Najnizszy,Wolumen)
 
 
 
+##tworzenie prezentacji
 my_presentation <- read_pptx() 
 
 
 my_presentation <- officer::add_slide(my_presentation, layout = "Title and Content", master = "Office Theme")
 my_presentation <- officer::ph_with_text(my_presentation, type = "title", str = "Zadanie 2")
-my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek az76558")
+my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek AZ76558")
 my_presentation <- officer::ph_with_text(my_presentation, type = "sldNum", str = "Slajd 1")
 my_presentation <- officer::ph_with_text(my_presentation, str = paste("1. Treść raportu:", "\n", 
                                                                       "1.1. Ogólną postać szeregów czasowych cen i wolumenu", "\n",
                                                                       "1.2. Histogram różnic kursów zamknięcia i otwarcia", "\n",
                                                                       "1.3. Boxplot różnic kursów max i min dla typów dni", "\n",
-                                                                      "1.4. Tabelę z podstawowymi statystykami pozycyjnymi danych."), type = "body")
+                                                                      "1.4. Tabelę z podstawowymi statystykami pozycyjnymi danych"), type = "body")
 # Slajd (2)
 my_presentation <- officer::add_slide(my_presentation, layout = "Title and Content", master = "Office Theme")
 my_presentation <- officer::ph_with_text(my_presentation, type = "title", str = "Zadanie 2.1")
-my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek az76558")
+my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek AZ76558")
 my_presentation <- officer::ph_with_text(my_presentation, type = "sldNum", str = "Slajd 2")
 my_presentation <- officer::ph_with_img(my_presentation, src = "Wykres1.jpeg")
 unlink("Wykres1.jpeg")
@@ -123,7 +133,7 @@ unlink("Wykres1.jpeg")
 #slaid (3)
 my_presentation <- officer::add_slide(my_presentation, layout = "Title and Content", master = "Office Theme")
 my_presentation <- officer::ph_with_text(my_presentation, type = "title", str = "Zadanie 2.2")
-my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Name")
+my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek AZ76558")
 my_presentation <- officer::ph_with_text(my_presentation, type = "sldNum", str = "Slajd 3")
 my_presentation <- officer::ph_with_img(my_presentation, src = "Wykres2.jpeg")
 unlink("Wykres2.jpeg")
@@ -131,7 +141,7 @@ unlink("Wykres2.jpeg")
 #slaid (4)
 my_presentation <- officer::add_slide(my_presentation, layout = "Title and Content", master = "Office Theme")
 my_presentation <- officer::ph_with_text(my_presentation, type = "title", str = "Zadanie 2.3")
-my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Name")
+my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek AZ76558")
 my_presentation <- officer::ph_with_text(my_presentation, type = "sldNum", str = "Slajd 4")
 my_presentation <- officer::ph_with_img(my_presentation, src = "Wykres3.jpeg")
 unlink("Wykres3.jpeg")
@@ -139,7 +149,7 @@ unlink("Wykres3.jpeg")
 #slaid (5)
 my_presentation <- officer::add_slide(my_presentation, layout = "Title and Content", master = "Office Theme")
 my_presentation <- officer::ph_with_text(my_presentation, type = "title", str = "Zadanie 2.3 ciąg dalszy")
-my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Name")
+my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek AZ76558")
 my_presentation <- officer::ph_with_text(my_presentation, type = "sldNum", str = "Slajd 5")
 my_presentation <- officer::ph_with_img(my_presentation, src = "Wykres4.jpeg")
 unlink("Wykres4.jpeg")
@@ -147,8 +157,8 @@ unlink("Wykres4.jpeg")
 # Slajd (6)
 my_presentation <- officer::add_slide(my_presentation, layout = "Title and Content", master = "Office Theme")
 my_presentation <- officer::ph_with_text(my_presentation, type = "title", str = "Zadanie 2.4")
-my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Name")
+my_presentation <- officer::ph_with_text(my_presentation, type = "ftr", str = "Albert Zagrajek AZ76558")
 my_presentation <- officer::ph_with_text(my_presentation, type = "sldNum", str = "Slajd 6")
-my_presentation <- officer::ph_with_table(my_presentation, type = "body", value = final_table)
+my_presentation <- officer::ph_with_table(my_presentation, type = "body", value = podsumowanie3)
 
-print(my_presentation, target = "Name.pptx") 
+print(my_presentation, target = "Albert_Zagrajek_76558.pptx") 
